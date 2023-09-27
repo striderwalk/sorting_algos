@@ -6,8 +6,7 @@ import button
 from consts import *
 
 
-def menu(screen):
-    clock = pygame.time.Clock()
+def menu(screen, clock):
 
     algos_dict = {
         "Bubble sort": algos.bubble_sort,
@@ -44,7 +43,8 @@ def menu(screen):
             if event.type == MOUSEBUTTONDOWN:
                 for i in button_group:
                     if i.update():
-                        return algos_dict[i.text]
+                        if i.text != "All":
+                            return {"text": i.text, "algo": algos_dict[i.text]}
 
         pygame.display.flip()
         clock.tick(FPS)

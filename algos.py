@@ -115,30 +115,27 @@ def merge_sort(lst):
 
             real_index = index * group_size
 
-            # i, j = 0, group_size
-            # yield ["mp", ("i", i + real_index)]
-            # yield ["mp", ("j", j + real_index)]
-
             # using selection
 
             for i in range(len(lst)):
                 yield ["mp", ("i", i + real_index)]
 
-                small_num = lst[i]
-                start = group_size if i < len(lst) // 2 else i
+                min_index = i
 
-                for j in range(start, len(lst)):
+                # Find the index of the minimum element in the remaining unsorted portion
+                for j in range(min_index, len(lst)):
                     yield ["mp", ("j", j + real_index)]
 
-                    if lst[j] < small_num:
-                        small_num = lst[j]
-                        lst[i], lst[j] = lst[j], lst[i]
-                        yield ["swap", (i + real_index, j + real_index)]
+                    if lst[j] < lst[min_index]:
+                        min_index = j
 
-                    # when gets to a minimum stop
-                    if j < len(lst) - 1 and lst[j + 1] > lst[j]:
+                    # elif lst[j - 1] < lst[j]:
+                    # break
 
-                        break
+                # Swap the found minimum element with the first element
+                yield ["swap", (min_index + real_index, i + real_index)]
+
+                lst[i], lst[min_index] = lst[min_index], lst[i]
 
             new_groups.append(lst)
 

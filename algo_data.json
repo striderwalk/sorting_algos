@@ -1,0 +1,7 @@
+{
+  "Bubble sort": { "size": 32 },
+  "Selection sort": { "size": 32 },
+  "Insertion sort": { "size": 32 },
+  "Merge sort": { "size": 64 },
+  "Quick sort": { "size": 128 }
+}

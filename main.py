@@ -1,23 +1,22 @@
 from os import environ
-
-from sorter import Sorter
+import sys
 
 environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
-import random
 
-import pygame  # import after disabling prompt
+import numpy as np
+import pygame
 
 import menu
 from consts import *
+from sorter import Sorter
+
 
 pygame.font.init()
 font = pygame.font.Font(None, 25)
 
 
 def get_random_array(length):
-    array = [i * 2 for i in range(length)]
-    random.shuffle(array)
-    return array
+    return list(np.random.randint(0, 256, size=length))
 
 
 def main():
@@ -29,35 +28,44 @@ def main():
 
     while True:
 
-        algo = menu.menu(win)
-
+        algo = menu.menu(win, clock)
         # game loop
-        surf = pygame.Surface((WIDTH, int(HEIGHT / 3)))
+        if algo["text"] != "all":
+            run_singlton(win, clock, algo["algo"], algo["text"])
+
+
+def run_singlton(win, clock, algo, name):
+    # setup -------------------------------------------->
+    surf = pygame.Surface((WIDTH, (HEIGHT / 8) * 7))
+    surf.fill(WHITE)
+
+    array = get_random_array(ALGO_DATA[name]["size"])
+    sort_display = Sorter(array, algo, surf)
+
+    while True:
+
+        surf = sort_display.update(surf)
+        if not surf:
+            break
+        surf = pygame.transform.flip(surf, False, True)
+        win.blit(surf, (0, HEIGHT // 6))
+
+        # check for input
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        # reset loop ----------->
+        # update the display
+        pygame.display.flip()
+        win.fill(WHITE)
         surf.fill(WHITE)
-        array = get_random_array(64)
-        display = Sorter(array, algo, surf)
-        while True:
+        pygame.display.set_caption(f"Sorting demo | {clock.get_fps():.2f}fps")
 
-            surf = display.update(surf)
-            if not surf:
-                break
-            surf = pygame.transform.flip(surf, False, True)
-            win.blit(surf, (0, HEIGHT // 6))
-
-            # update screen
-            pygame.display.flip()
-            win.fill(WHITE)
-            surf.fill(WHITE)
-
-            # check for input
-            for event in pygame.event.get():
-                # print(event)
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return
-            clock.tick(FPS)
-
-    pygame.quit()
+        # limit fps
+        clock.tick(FPS)
 
 
 if __name__ == "__main__":
