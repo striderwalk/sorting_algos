@@ -4,7 +4,7 @@ import json
 
 WIDTH, HEIGHT = 800, 600
 BUTTON_WIDTH, BUTTON_HEIGHT = 300, 35
-FPS = 15
+FPS = 60
 # colours
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)

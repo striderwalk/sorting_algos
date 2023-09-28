@@ -14,6 +14,7 @@ def menu(screen, clock):
         "Insertion sort": algos.insertion_sort,
         "Merge sort": algos.merge_sort,
         "Quick sort": algos.quick_sort,
+        "All": None,
     }
 
     button_group = pygame.sprite.Group()
@@ -45,6 +46,8 @@ def menu(screen, clock):
                     if i.update():
                         if i.text != "All":
                             return {"text": i.text, "algo": algos_dict[i.text]}
+                        else:
+                            return {"text": "all"}
 
         pygame.display.flip()
         clock.tick(FPS)

@@ -10,27 +10,33 @@ class Sorter:
     def __init__(self, array, algo, screen):
         self.array = list(array)
         self.instructions = algo(array)
-        self.x_scale = (screen.get_width()) // len(array)
-        self.y_scale = (screen.get_height() - 60) / max(array)
-        self.y_offset = 60
+        self.algo = algo
+        self.x_scale = (screen.get_width()) / len(array)
+        self.y_scale = (screen.get_height() - 50) / max(array)
+        self.y_offset = 50
 
         self.pointers = {}
 
         self.end_index = 0
 
     def draw(self, screen):
+        # screen.fill(GRAY)
         # draw array
         for index, i in enumerate(self.array):
             x = self.x_scale * index
             y = self.y_offset
             pygame.draw.rect(
-                screen, BLACK, (x, y, self.x_scale, i * self.y_scale), border_radius=3
+                screen,
+                BLACK,
+                (x, y, self.x_scale + 1, i * self.y_scale),
+                border_bottom_left_radius=3,
+                border_bottom_right_radius=3,
             )
         for row, pointer in enumerate(self.pointers.items()):
             _, (colour, index) = pointer
             x = self.x_scale * index
             y = self.y_offset - 2 - ((row + 1) * 15)
-            pygame.draw.rect(screen, colour, (x, y, self.x_scale, 15), border_radius=3)
+            pygame.draw.rect(screen, colour, (x, y, self.x_scale, 15), border_radius=5)
 
     def end(self, screen):
         if self.end_index > len(self.array):
@@ -45,7 +51,11 @@ class Sorter:
             x = self.x_scale * index
             y = self.y_offset
             pygame.draw.rect(
-                screen, colour, (x, y, self.x_scale, i * self.y_scale), border_radius=3
+                screen,
+                colour,
+                (x, y, self.x_scale + 1, i * self.y_scale),
+                border_bottom_left_radius=3,
+                border_bottom_right_radius=3,
             )
         return screen
 
@@ -73,7 +83,7 @@ class Sorter:
             )
 
         if cur_instruction[0] == "swap":
-            BEEP.play()
+            # BEEP.play()
             index1, index2 = cur_instruction[1]
 
             i1, i2 = self.array[index1], self.array[index2]
@@ -83,8 +93,9 @@ class Sorter:
                 pygame.draw.rect(
                     screen,
                     YELLOW,
-                    (x, y, self.x_scale, i * self.y_scale),
-                    border_radius=3,
+                    (x, y, self.x_scale + 1, i * self.y_scale),
+                    border_bottom_left_radius=3,
+                    border_bottom_right_radius=3,
                 )
             self.array[index1], self.array[index2] = (
                 self.array[index2],

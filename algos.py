@@ -6,42 +6,43 @@ def quick_sort(arr):
         return []
 
     stack = [(0, len(arr) - 1)]  # Stack to store the left and right indices
-    instructions = []
-    instructions.append(["pointer", {"id": "p", "index": 0, "colour": RED}])
+
+    yield ["pointer", {"id": "p", "index": 0, "colour": GREEN}]
+    yield ["pointer", {"id": "i", "index": 0, "colour": RED}]
+    yield ["pointer", {"id": "j", "index": 0, "colour": BLUE}]
 
     while stack:
         left, right = stack.pop()
         if left < right:
-            pivot_index, _instructions = partition(arr, left, right)
-            instructions.extend(_instructions)
+
+            pivot = arr[right]
+            yield ["mp", ("p", left + (right - left) // 2)]
+
+            i = left - 1
+            yield ["mp", ("i", i)]
+
+            for j in range(left, right):
+                yield ["mp", ("j", j)]
+
+                if arr[j] < pivot:
+                    i += 1
+                    yield ["mp", ("i", i)]
+
+                    arr[i], arr[j] = arr[j], arr[i]
+                    yield ["swap", (i, j)]
+
+            arr[i + 1], arr[right] = arr[right], arr[i + 1]
+            yield ["swap", (i + 1, right)]
+
+            pivot_index = i + 1
+            yield ["mp", ("p", pivot_index)]
+
             if pivot_index - left > right - pivot_index:
                 stack.append((left, pivot_index - 1))
                 stack.append((pivot_index + 1, right))
             else:
                 stack.append((pivot_index + 1, right))
                 stack.append((left, pivot_index - 1))
-
-    yield from instructions
-
-
-def partition(arr, low, high):
-    instructions = []
-
-    pivot = arr[high]
-    i = low - 1
-
-    for j in range(low, high):
-        instructions.append(["mp", ("p", pivot)])
-
-        if arr[j] < pivot:
-            i += 1
-            arr[i], arr[j] = arr[j], arr[i]
-            instructions.append(["swap", (i, j)])
-
-    arr[i + 1], arr[high] = arr[high], arr[i + 1]
-    instructions.append(["swap", (i + 1, high)])
-
-    return i + 1, instructions
 
 
 def bubble_sort(lst):
@@ -109,35 +110,38 @@ def merge_sort(lst):
         new_groups = []
         for index in range(0, len(groups), 2):
             if index < len(groups) - 1:
-                lst = groups[index] + groups[index + 1]
+                lst1 = groups[index]
+                lst2 = groups[index + 1]
+
             else:
                 lst = groups[index]
+                new_groups.append(lst)
+                continue
 
-            real_index = index * group_size
+            real_index_1 = index * group_size
+            real_index_2 = real_index_1 + len(lst1)
 
-            # using selection
+            for i in range(len(lst2) - 1, -1, -1):
+                yield ["mp", ("i", i + real_index_2)]
 
-            for i in range(len(lst)):
-                yield ["mp", ("i", i + real_index)]
+                last = lst1[len(lst1) - 1]
+                j = len(lst1) - 2
+                yield ["mp", ("j", j + real_index_1)]
 
-                min_index = i
+                while j >= 0 and lst1[j] > lst2[i]:
+                    lst1[j + 1] = lst1[j]
+                    yield ["swap", (j + real_index_1, j + real_index_1 + 1)]
 
-                # Find the index of the minimum element in the remaining unsorted portion
-                for j in range(min_index, len(lst)):
-                    yield ["mp", ("j", j + real_index)]
+                    j -= 1
+                    yield ["mp", ("j", j + real_index_1)]
 
-                    if lst[j] < lst[min_index]:
-                        min_index = j
+                if last > lst2[i]:
+                    yield ["swap", (j + 1 + real_index_1, i + real_index_2)]
 
-                    # elif lst[j - 1] < lst[j]:
-                    # break
+                    lst1[j + 1] = lst2[i]
+                    lst2[i] = last
 
-                # Swap the found minimum element with the first element
-                yield ["swap", (min_index + real_index, i + real_index)]
-
-                lst[i], lst[min_index] = lst[min_index], lst[i]
-
-            new_groups.append(lst)
+            new_groups.append(lst1 + lst2)
 
         groups = new_groups
         group_size *= 2
